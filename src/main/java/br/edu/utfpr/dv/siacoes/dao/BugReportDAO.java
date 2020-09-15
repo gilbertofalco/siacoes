@@ -17,7 +17,6 @@ import br.edu.utfpr.dv.siacoes.model.User;
 public class BugReportDAO {
 	
 	public BugReport findById(int id) throws SQLException{
-		
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		
@@ -41,13 +40,14 @@ public class BugReportDAO {
 	}
 	
 	public List<BugReport> listAll() throws SQLException{
-                PreparedStatement stmt = null;
+		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		
-            try(Connection conn = ConnectionDAO.getInstance().getConnection()){
+		try(Connection conn = ConnectionDAO.getInstance().getConnection()){
 			stmt = conn.prepareStatement("SELECT bugreport.*, \"user\".name " +
 					"FROM bugreport INNER JOIN \"user\" ON \"user\".idUser=bugreport.idUser " +
 					"ORDER BY status, reportdate");
+			
 			List<BugReport> list = new ArrayList<BugReport>();
 			
 			while(rs.next()){
@@ -56,7 +56,7 @@ public class BugReportDAO {
 			
 			return list;
 		}finally{
-                        ConnectionDAO.closeStatement(stmt, rs);
+			ConnectionDAO.closeStatement(stmt, rs);
 		}
 	}
 	
@@ -65,7 +65,7 @@ public class BugReportDAO {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		
-                try(Connection conn = ConnectionDAO.getInstance().getConnection()){
+		try(Connection conn = ConnectionDAO.getInstance().getConnection()){
 			
 			if(insert){
 				stmt = conn.prepareStatement("INSERT INTO bugreport(idUser, module, title, description, reportDate, type, status, statusDate, statusDescription) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);

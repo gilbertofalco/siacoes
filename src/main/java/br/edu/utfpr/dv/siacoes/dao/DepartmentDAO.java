@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,14 +12,13 @@ import java.util.List;
 import br.edu.utfpr.dv.siacoes.log.UpdateEvent;
 import br.edu.utfpr.dv.siacoes.model.Department;
 
-public class DepartmentDAO {
+public class DepartmentDAO extends AbstractDAO<Department>{
 
 	public Department findById(int id) throws SQLException{
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		
 		try(Connection conn = ConnectionDAO.getInstance().getConnection()){
-			
 			stmt = conn.prepareStatement(
 				"SELECT department.*, campus.name AS campusName " +
 				"FROM department INNER JOIN campus ON campus.idCampus=department.idCampus " +
@@ -39,15 +39,15 @@ public class DepartmentDAO {
 	}
 	
 	public List<Department> listAll(boolean onlyActive) throws SQLException{
-	
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		
 		try(Connection conn = ConnectionDAO.getInstance().getConnection()){
+			
 			stmt = conn.prepareStatement("SELECT department.*, campus.name AS campusName " +
 					"FROM department INNER JOIN campus ON campus.idCampus=department.idCampus " + 
 					(onlyActive ? " WHERE department.active=1" : "") + " ORDER BY department.name");
-			
+		
 			List<Department> list = new ArrayList<Department>();
 			
 			while(rs.next()){
@@ -56,7 +56,7 @@ public class DepartmentDAO {
 			
 			return list;
 		}finally{
-                    ConnectionDAO.closeStatement(stmt, rs);
+			ConnectionDAO.closeStatement(stmt, rs);
 		}
 	}
 	
@@ -64,10 +64,13 @@ public class DepartmentDAO {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		
-                try(Connection conn = ConnectionDAO.getInstance().getConnection()){
+		try(Connection conn = ConnectionDAO.getInstance().getConnection()){
 			stmt = conn.prepareStatement("SELECT department.*, campus.name AS campusName " +
 					"FROM department INNER JOIN campus ON campus.idCampus=department.idCampus " +
-					"WHERE department.idCampus=" + String.valueOf(idCampus) + (onlyActive ? " AND department.active=1" : "") + " ORDER BY department.name");
+					"WHERE department.idCampus = ? " +
+					(onlyActive ? " AND department.active=1" : "") + " ORDER BY department.name");
+		
+			stmt.setInt(1, idCampus);
 			
 			List<Department> list = new ArrayList<Department>();
 			
@@ -129,7 +132,7 @@ public class DepartmentDAO {
 			ConnectionDAO.closeStatement(stmt, rs);
 		}
 	}
-	
+
 	private Department loadObject(ResultSet rs) throws SQLException{
 		Department department = new Department();
 		

@@ -2,6 +2,8 @@ package br.edu.utfpr.dv.siacoes.dao;
 
 import java.io.FileInputStream;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
@@ -87,6 +89,13 @@ public class ConnectionDAO {
 			Statement stmt = this.datasource.getConnection().createStatement();
 			stmt.execute("SET GLOBAL max_allowed_packet=1024*1024*14;");	
 		}
+	}
+	
+	public static void closeStatement (PreparedStatement stmt, ResultSet rs) throws SQLException  {
+		if((rs != null) && !rs.isClosed())
+			rs.close();
+		if((stmt != null) && !stmt.isClosed())
+			stmt.close();
 	}
 	
 }

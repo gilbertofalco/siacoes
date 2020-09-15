@@ -11,7 +11,7 @@ import java.util.List;
 import br.edu.utfpr.dv.siacoes.log.UpdateEvent;
 import br.edu.utfpr.dv.siacoes.model.ActivityUnit;
 
-public class ActivityUnitDAO {
+public class ActivityUnitDAO extends AbstractDAO<ActivityUnit>{
 	
 	public List<ActivityUnit> listAll() throws SQLException{
 		PreparedStatement stmt = null;
@@ -19,9 +19,7 @@ public class ActivityUnitDAO {
 		
 		try(Connection conn = ConnectionDAO.getInstance().getConnection()){
 			stmt = conn.prepareStatement("SELECT * FROM activityunit ORDER BY description");
-			
 			List<ActivityUnit> list = new ArrayList<ActivityUnit>();
-			
 			while(rs.next()){
 				list.add(this.loadObject(rs));
 			}
@@ -33,23 +31,23 @@ public class ActivityUnitDAO {
 	}
 	
 	public ActivityUnit findById(int id) throws SQLException{
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
 		
-                try(Connection conn = ConnectionDAO.getInstance().getConnection()){
-			stmt = conn.prepareStatement("SELECT * FROM activityunit WHERE idActivityUnit=?");
-		
+		try(Connection conn = ConnectionDAO.getInstance().getConnection(); 
+				PreparedStatement stmt = conn.prepareStatement("SELECT * FROM activityunit WHERE idActivityUnit=?")){
+			
 			stmt.setInt(1, id);
-			
-			rs = stmt.executeQuery();
-			
-			if(rs.next()){
-				return this.loadObject(rs);
-			}else{
-				return null;
+			try(ResultSet rs = stmt.executeQuery()) {
+				if(rs.next()){
+					return this.loadObject(rs);
+				}else{
+					return null;
+				}
+			} catch (SQLException e) {
+				throw new SQLException(e);
 			}
-		}finally{
-                        ConnectionDAO.closeStatement(stmt, rs);
+			
+		} catch (SQLException e) {
+			throw new SQLException(e);
 		}
 	}
 	
@@ -57,8 +55,11 @@ public class ActivityUnitDAO {
 		boolean insert = (unit.getIdActivityUnit() == 0);
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
+		String query = "";
 		
 		try(Connection conn = ConnectionDAO.getInstance().getConnection()){
+
+			
 			if(insert){
 				stmt = conn.prepareStatement("INSERT INTO activityunit(description, fillAmount, amountDescription) VALUES(?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
 			}else{
@@ -89,7 +90,7 @@ public class ActivityUnitDAO {
 			
 			return unit.getIdActivityUnit();
 		}finally{
-                    ConnectionDAO.closeStatement(stmt, rs);
+			ConnectionDAO.closeStatement(stmt, rs);
 		}
 	}
 	
