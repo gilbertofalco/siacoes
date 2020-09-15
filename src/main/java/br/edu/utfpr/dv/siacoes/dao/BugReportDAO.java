@@ -14,7 +14,7 @@ import br.edu.utfpr.dv.siacoes.model.BugReport.BugStatus;
 import br.edu.utfpr.dv.siacoes.model.Module;
 import br.edu.utfpr.dv.siacoes.model.User;
 
-public class BugReportDAO {
+public class BugReportDAO extends AbstractDAO<BugReport> {
 	
 	public BugReport findById(int id) throws SQLException{
 		PreparedStatement stmt = null;

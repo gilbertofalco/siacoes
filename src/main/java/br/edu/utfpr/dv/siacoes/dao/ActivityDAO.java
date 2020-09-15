@@ -11,8 +11,8 @@ import java.util.List;
 import br.edu.utfpr.dv.siacoes.log.UpdateEvent;
 import br.edu.utfpr.dv.siacoes.model.Activity;
 
-public class ActivityDAO extends AbstractDAO<T>{
-	
+public class ActivityDAO extends AbstractDAO<Activity>{
+
 	public boolean needsFillAmount(int idActivity) throws SQLException{
 		Connection conn = null;
 		Statement stmt = null;
